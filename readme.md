@@ -86,6 +86,220 @@ Then execute the command invoking with flask cli with command name and the relev
 $ flask user create bob bobpass
 ```
 
+## CLI Commands For Internship Platform (Assigned Project)
+
+This project includes a comprehensive CLI interface for managing internships, users, and applications. Before using any CLI commands, ensure you have initialized the database and are logged in as the appropriate user type.
+
+### Prerequisites
+
+1. **Initialize the database** (required before first use):
+   ```bash
+   $ flask init
+   ```
+
+2. **Login as appropriate user** before executing commands:
+   ```bash
+   $ flask login user-login <user_type> <username> <password>
+   ```
+   Where `user_type` is one of: `student`, `employer`, `staff`
+
+3. **Default Users Credentials** (created during initialization, must be used):
+   - Student: `student1` / `password1`
+   - Employer: `employer1` / `password1`
+   - Staff: `staff1` / `password1`
+
+**Note** - All ID fields, start at **1**
+
+### Authentication Commands
+
+#### Login
+```bash
+$ flask login user-login <user_type> <username> <password>
+```
+**Purpose:** Log in as a specific user type to access role-specific commands.
+
+**Arguments:**
+- `user_type`: Type of user (`student`, `employer`, `staff`)
+- `username`: Username for the account
+- `password`: Password for the account
+
+**Example:**
+```bash
+$ flask login user-login employer employer1 password1
+```
+
+#### Logout
+```bash
+$ flask logout user-logout
+```
+**Purpose:** Log out the current user and clear the session.
+
+### Staff Commands
+
+Staff members can manage internship shortlists and view all internships.
+
+```bash
+$ flask staff <command>
+```
+
+#### Add Student to Shortlist
+```bash
+$ flask staff add-student <student_id> <internship_id>
+```
+**Purpose:** Add a student to an internship shortlist.
+
+**Arguments:**
+- `student_id`: ID of the student to add
+- `internship_id`: ID of the internship position
+
+**Example:**
+
+```bash
+flask staff add-student 1 1
+```
+
+**Requirements:** Must be logged in as staff.
+
+#### List All Internships
+```bash
+$ flask staff list-internships
+```
+**Purpose:** View all available internship positions.
+
+**Requirements:** Must be logged in as staff.
+
+### Employer Commands
+
+Employers can create internships, view shortlisted applicants, and respond to the shortlist.
+
+```bash
+$ flask employer <command>
+```
+
+#### Create Internship
+```bash
+$ flask employer create-internship <title> <description> <location> <duration> <salary>
+```
+**Purpose:** Create a new internship position.
+
+**Arguments:**
+- `title`: Job title/position name
+- `description`: Job description and requirements
+- `location`: Work location
+- `duration`: Length of internship in months
+- `salary`: Compensation amount
+
+**Requirements:** Must be logged in as employer.
+
+**Example:**
+```bash
+$ flask employer create-internship "Software Intern" "Python, Flask development" "Remote" "3" "1000"
+```
+
+#### Accept Student
+```bash
+$ flask employer accept-student <shortlist_id>
+```
+**Purpose:** Accept a student from the shortlist for an internship.
+
+**Arguments:**
+- `shortlist_id`: ID of the shortlist entry
+
+**Requirements:** Must be logged in as employer who owns the internship.
+
+#### Reject Student
+```bash
+$ flask employer reject-student <shortlist_id>
+```
+**Purpose:** Reject a student from the shortlist for an internship.
+
+**Arguments:**
+- `shortlist_id`: ID of the shortlist entry
+
+**Requirements:** Must be logged in as employer who owns the internship.
+
+#### View Applications for Specific Internship
+```bash
+$ flask employer view-shortlist <internship_id>
+```
+**Purpose:** View all student applications for a specific internship.
+
+**Arguments:**
+- `internship_id`: ID of the internship position
+
+**Requirements:** Must be logged in as employer who owns the internship.
+
+#### View All Applications
+```bash
+$ flask employer view-all-shortlist
+```
+**Purpose:** View all student applications across all employer's internships.
+
+**Requirements:** Must be logged in as employer.
+
+### Student Commands
+
+Students can view their shortlisted positions and employer responses.
+
+```bash
+$ flask student <command>
+```
+
+#### View All Shortlisted Positions
+```bash
+$ flask student view-all-shortlist
+```
+**Purpose:** View all internships the student has been shortlisted for.
+
+**Requirements:** Must be logged in as student.
+
+**Output:** List of shortlist entries with internship details.
+
+#### View Employer Response
+```bash
+$ flask student view-employer-response <shortlist_id>
+```
+**Purpose:** View employer's response (accepted/rejected) for a specific shortlist entry.
+
+**Arguments:**
+- `shortlist_id`: ID of the shortlist entry
+
+**Requirements:** Must be logged in as student.
+
+**Output:** Response status and details, or error if no response exists.
+
+### Usage Examples
+
+#### Complete Workflow Example
+
+1. **Initialize system:**
+   ```bash
+   $ flask init
+   ```
+
+2. **Employer creates internship:**
+   ```bash
+   $ flask login user-login employer employer1 password1
+   $ flask employer create-internship "Data Analyst" "Python, SQL, Analytics" "Hybrid" "6" "1500"
+   ```
+
+3. **Staff adds student to shortlist:**
+   ```bash
+   $ flask login user-login staff staff1 password1
+   $ flask staff add-student 1 1
+   ```
+
+4. **Employer responds to application:**
+   ```bash
+   $ flask login user-login employer employer1 password1
+   $ flask employer accept-student 1
+   ```
+
+5. **Student views response:**
+   ```bash
+   $ flask login user-login student student1 password1
+   $ flask student view-employer-response 1
+   ```
 
 # Running the Project
 
