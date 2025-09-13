@@ -7,9 +7,21 @@ class InternshipPositions(db.Model):
     title = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
     location = db.Column(db.String(100), nullable=False)
-    duration = db.Column(db.Integer, nullable=False)
+    durationInMonths = db.Column(db.Integer, nullable=False)
     salary = db.Column(db.Float, nullable=True)
     createdAt = db.Column(db.DateTime, nullable=False, server_default=db.func.now())
     
     # Composition: reference to Employer object
     employer = db.relationship('Employer', backref='internship_positions')
+    
+    def get_json(self):
+        return {
+            'internshipId': self.internshipId,
+            'employerId': self.employerId,
+            'title': self.title,
+            'description': self.description,
+            'location': self.location,
+            'durationInMonths': self.durationInMonths,
+            'salary': self.salary,
+            'createdAt': self.createdAt.isoformat()
+        }

@@ -6,3 +6,11 @@ class Employer(db.Model):
     password = db.Column(db.String(120), nullable=False)
     companyName = db.Column(db.String(100), nullable=False)
     jobTitle = db.Column(db.String(100), nullable=False)
+    
+    def get_json(self):
+        return {
+            'employerId': self.employerId,
+            'username': self.username,
+            'companyName': self.companyName,
+            'jobTitle': self.jobTitle
+        }

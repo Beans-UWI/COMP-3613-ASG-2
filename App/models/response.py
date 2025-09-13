@@ -9,3 +9,11 @@ class Response(db.Model):
     # Composition: references to Shortlist and Employer objects
     shortlist = db.relationship('Shortlist', backref='responses')
     employer = db.relationship('Employer', backref='responses')
+    
+    def get_json(self):
+        return {
+            'responseId': self.responseId,
+            'shortlistId': self.shortlistId,
+            'employerId': self.employerId,
+            'status': self.status
+        }

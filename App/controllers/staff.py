@@ -1,4 +1,5 @@
 from App.models import Staff
+from App.controllers.state import get_session_state
 from App.database import db
 
 def create_staff(username, password, department):
@@ -20,3 +21,11 @@ def can_staff_login(username, password):
         return False
     print("Staff login successful")
     return True
+
+def get_current_staff_id():
+    state = get_session_state()
+    username = state.username
+    staff = get_staff_by_username(username)
+    if staff:
+        return staff.staffId
+    return None

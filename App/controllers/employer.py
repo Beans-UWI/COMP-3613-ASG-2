@@ -1,4 +1,5 @@
 from App.models import Employer
+from App.controllers.state import get_session_state
 from App.database import db
 
 def create_employer(username, password, companyName, jobTitle):
@@ -20,3 +21,11 @@ def can_employer_login(username, password):
         return False
     print("Employer login successful")
     return True
+
+def get_current_employer_id():
+    state = get_session_state()
+    username = state.username
+    employer = get_employer_by_username(username)
+    if employer:
+        return employer.employerId
+    return None

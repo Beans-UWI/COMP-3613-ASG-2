@@ -5,3 +5,10 @@ class Student(db.Model):
     username = db.Column(db.String(20), nullable=False, unique=True)
     password = db.Column(db.String(120), nullable=False)
     major = db.Column(db.String(100), nullable=False)
+    
+    def get_json(self):
+        return {
+            'studentId': self.studentId,
+            'username': self.username,
+            'major': self.major
+        }

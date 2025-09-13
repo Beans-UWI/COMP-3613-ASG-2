@@ -18,7 +18,7 @@ migrate = get_migrate(app)
 @app.cli.command("init", help="Creates and initializes the database")
 def init():
     initialize()
-    print('database intialized')
+    print('[INFO] Database initialized')   
 
 '''
 User Commands
@@ -45,7 +45,7 @@ def login_user_command(user_type, username, password):
             logout_session()
             if can_employer_login(username, password):
                 login_session(username, user_type)
-    print(f'Logged in {user_type} - {username}...')
+    print(f'Logged in {user_type} - {username}')
     
 app.cli.add_command(login_cli)
 
@@ -66,53 +66,87 @@ staff_cli = AppGroup('staff', help='Staff user commands')
 @require_user_type("staff")
 def list_internships_command():
     print("Listing all internships...")
-    # call a controller function to get internships from the database
+    internships = view_all_internships()
+    for internship in internships:
+        print(internship)
 
 @staff_cli.command("add-student", help="Add a student to internship shortlist")
 @click.argument("student_id")
 @click.argument("internship_id")
+@require_user_type("staff")
 def add_student_command(student_id, internship_id):
     print(f"Adding student {student_id} to internship {internship_id} shortlist...")
+    create_shortlist(student_id, internship_id)
+    print("Student added to shortlist.")
 
 app.cli.add_command(staff_cli)
 
 # employer commands
 employer_cli = AppGroup('employer', help='Employer user commands')
+
 @employer_cli.command("create-internship", help="Create a new internship")
-def create_internship_command():
+@click.argument("title")
+@click.argument("description")
+@click.argument("location")
+@click.argument("duration")
+@click.argument("salary")
+@require_user_type("employer")
+def create_internship_command(title, description, location, duration, salary):
     print("Creating a new internship...")
-    #controller function to create a new internship
+    create_internship_position(title, description, location, duration, salary)
+    print("Internship created successfully.")
+
 @employer_cli.command("view-shortlist", help="View applications for an internship")
 @click.argument("internship_id")
+@require_user_type("employer")
 def view_shortlist_command(internship_id):
     print(f"Viewing internship shortlist for internship {internship_id}...")
-    #controller function to view internship shortlist
+    shortlist = view_shortlist_by_internship_id(internship_id)
+    for item in shortlist:
+        print(item)
+
+@employer_cli.command("view-all-shortlist", help="View all applications for all internships")
+@require_user_type("employer")
+def view_all_shortlist_command():
+    print(f"Viewing all internship shortlists...")
+    shortlists = view_all_shortlists()
+    for item in shortlists:
+        print(item)
+
 @employer_cli.command("accept-student", help="Accept a student for an internship")
-@click.argument("student_id")
-@click.argument("internship_id")
-def accept_student_command(student_id, internship_id):
-    print(f"Accepting student {student_id} for internship {internship_id}...")
-    #controller function to accept a student for an internship
+@click.argument("shortlist_id")
+@require_user_type("employer")
+def accept_student_command(shortlist_id):
+    print(f"Accepting student...")
+    accept_student(shortlist_id)
+    print("Student accepted.")
+
 @employer_cli.command("reject-student", help="Reject a student for an internship")
-@click.argument("student_id")
-@click.argument("internship_id")
-def reject_student_command(student_id, internship_id):
-    print(f"Rejecting student {student_id} for internship {internship_id}...")
-    #controller function to reject a student for an internship
+@click.argument("shortlist_id")
+@require_user_type("employer")
+def reject_student_command(shortlist_id):
+    print(f"Rejecting student...")
+    reject_student(shortlist_id)
+    print("Student rejected.")
 
 app.cli.add_command(employer_cli)
 
 # student commands
 student_cli = AppGroup('student', help='Student user commands')
+
 @student_cli.command("list-shortlist", help="List shortlisted internships")
 def list_shortlisted_internships_command():
     print("Listing shortlisted internships...")
-    #controller function to list shortlisted internships
+    shortlists = view_all_shortlists()
+    for item in shortlists:
+        print(item)
+
 @student_cli.command("view-employer-response", help="View employer response for an internship")
-@click.argument("internship_id")
-def view_employer_command(internship_id):
-    print(f"Viewing employer response for internship {internship_id}...")
-    #controller function to view employer response for an internship
+@click.argument("shortlist_id")
+def view_employer_command(shortlist_id):
+    print(f"Viewing employer response for shortlist {shortlist_id}...")
+    print(view_response(shortlist_id))
+
 app.cli.add_command(student_cli)
 
 '''

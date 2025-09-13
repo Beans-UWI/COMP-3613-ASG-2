@@ -11,3 +11,12 @@ class Shortlist(db.Model):
     student = db.relationship('Student', backref='shortlists')
     internship = db.relationship('InternshipPositions', backref='shortlists')
     staff = db.relationship('Staff', backref='shortlists')
+    
+    def get_json(self):
+        return {
+            'shortlistId': self.shortlistId,
+            'studentId': self.studentId,
+            'internshipId': self.internshipId,
+            'staffId': self.staffId,
+            'lastUpdated': self.lastUpdated.isoformat()
+        }
