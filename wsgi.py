@@ -134,9 +134,9 @@ app.cli.add_command(employer_cli)
 # student commands
 student_cli = AppGroup('student', help='Student user commands')
 
-@student_cli.command("list-shortlist", help="List shortlisted internships")
-def list_shortlisted_internships_command():
-    print("Listing shortlisted internships...")
+@student_cli.command("view-all-shortlist", help="View all shortlisted internships")
+def view_shortlisted_internships_command():
+    print("Viewing all shortlisted internships...")
     shortlists = view_all_shortlists()
     for item in shortlists:
         print(item)
