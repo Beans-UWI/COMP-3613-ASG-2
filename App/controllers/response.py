@@ -3,10 +3,18 @@ from App.models import Response
 from App.database import db
 
 def create_response(shortlist_id, employer_id, status):
-    response = Response(shortlistId=shortlist_id, employerId=employer_id, status=status)
-    db.session.add(response)
-    db.session.commit()
-    return response
+    existing_response = get_response_by_shortlist_id(shortlist_id)
+    
+    if existing_response:
+        existing_response.status = status
+        existing_response.employerId = employer_id
+        db.session.commit()
+        return existing_response
+    else:
+        response = Response(shortlistId=shortlist_id, employerId=employer_id, status=status)
+        db.session.add(response)
+        db.session.commit()
+        return response
 
 def get_response_by_shortlist_id(shortlist_id):
     return db.session.execute(db.select(Response).filter_by(shortlistId=shortlist_id)).scalar_one_or_none()
