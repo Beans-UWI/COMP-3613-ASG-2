@@ -398,6 +398,115 @@ views = [
 ]
 ```
 
+## REST API Endpoints
+
+This section documents the HTTP API endpoints provided by the views for students, staff and employers. The examples assume the app is running on http://127.0.0.1:8080/.
+
+Student endpoints
+
+- GET /api/<student_id>/view-all-shortlist
+   - Description: Returns all shortlists for the specified student.
+   - Path parameters:
+      - student_id: string
+   - Response: 200 OK with JSON array of shortlist objects
+   - Example:
+
+      curl -sS http://127.0.0.1:8080//api/1/view-all-shortlist
+
+- GET /api/<student_id>/view-employer-response/<shortlist_id>
+   - Description: Returns the employer's response for a given shortlist entry.
+   - Path parameters:
+      - student_id: string
+      - shortlist_id: integer
+   - Response: 200 OK with JSON object (or empty object if no response)
+   - Example:
+
+      curl -sS http://127.0.0.1:8080//api/1/view-employer-response/1
+
+Employer endpoints
+
+- POST /api/<employer_id>/create-internship
+   - Description: Create a new internship for the employer.
+   - Path parameters:
+      - employer_id: string
+   - JSON body fields:
+      - title (string)
+      - description (string)
+      - location (string)
+      - durationInMonths (number)
+      - salary (string or number)
+   - Response: 201 Created with message
+   - Example:
+
+      curl -X POST http://127.0.0.1:8080//api/employer1/create-internship \
+         -H "Content-Type: application/json" \
+         -d '{"title":"Data Analyst","description":"Python, SQL","location":"Hybrid","durationInMonths":6,"salary":"1500"}'
+
+- GET /api/<employer_id>/view-shortlist/<internship_id>
+   - Description: Returns shortlist entries for the specified internship.
+   - Path parameters:
+      - employer_id: string
+      - internship_id: integer
+   - Response: 200 OK with JSON array
+   - Example:
+
+      curl -sS http://127.0.0.1:8080//api/employer1/view-shortlist/1
+
+- GET /api/<employer_id>/view-all-shortlist
+   - Description: Returns all shortlist entries across the employer's internships.
+   - Path parameters:
+      - employer_id: string
+   - Response: 200 OK with JSON array
+   - Example:
+
+      curl -sS http://127.0.0.1:8080//api/employer1/view-all-shortlist
+
+- POST /api/<employer_id>/accept-student/<shortlist_id>
+   - Description: Mark a shortlist entry as accepted.
+   - Path parameters:
+      - employer_id: string
+      - shortlist_id: integer
+   - Response: 200 OK with message
+   - Example:
+
+      curl -X POST http://127.0.0.1:8080//api/employer1/accept-student/1
+
+- POST /api/<employer_id>/reject-student/<shortlist_id>
+   - Description: Mark a shortlist entry as rejected.
+   - Path parameters:
+      - employer_id: string
+      - shortlist_id: integer
+   - Response: 200 OK with message
+   - Example:
+
+      curl -X POST http://127.0.0.1:8080//api/employer1/reject-student/1
+
+Staff endpoints
+
+- GET /<staff_id>/list-internships
+   - Description: Returns all internships (staff view).
+   - Path parameters:
+      - staff_id: string
+   - Response: 200 OK with JSON array
+   - Example:
+
+      curl -sS http://127.0.0.1:8080//staff1/list-internships
+
+- POST /<staff_id>/add-student
+   - Description: Add a student to an internship shortlist.
+   - Path parameters:
+      - staff_id: string
+   - JSON body fields:
+      - student_id (string)
+      - internship_id (number)
+   - Response: 201 Created with message
+   - Example:
+
+      curl -X POST http://127.0.0.1:8080//staff1/add-student \
+         -H "Content-Type: application/json" \
+         -d '{"student_id":"1","internship_id":1}'
+
+
 ## Cannot Update Workflow file
 
 If you are running into errors in gitpod when updateding your github actions file, ensure your [github permissions](https://gitpod.io/integrations) in gitpod has workflow enabled ![perms](./images/gitperms.png)
