@@ -10,6 +10,9 @@ def create_student(username, password, major):
 def get_student_by_username(username):
     return db.session.execute(db.select(Student).filter_by(username=username)).scalar_one_or_none()
 
+def get_student_by_id(student_id):
+    return db.session.get(Student, student_id)
+
 def can_student_login(username, password):
     student = get_student_by_username(username)
     if not student:
