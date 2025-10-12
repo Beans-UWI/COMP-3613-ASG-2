@@ -11,6 +11,9 @@ def create_employer(username, password, companyName, jobTitle):
 def get_employer_by_username(username):
     return db.session.execute(db.select(Employer).filter_by(username=username)).scalar_one_or_none()
 
+def get_employer_by_id(employer_id):
+    return db.session.get(Employer, employer_id)
+
 def can_employer_login(username, password):
     employer = get_employer_by_username(username)
     if not employer:
