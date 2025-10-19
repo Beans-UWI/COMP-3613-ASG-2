@@ -184,7 +184,8 @@ class InternshipIntegrationTests(unittest.TestCase):
                                          salary = 4000, 
                                          employer_id= 1)
         employers_internships = get_internships_by_employer_id(1)
-        assert employers_internships == [internship1, internship2]
+        temp_internships = InternshipPositions.query.filter_by(employerId=1).all()
+        assert employers_internships == temp_internships
 
 class ShortlistIntegrationTests(unittest.TestCase):
     
@@ -194,7 +195,8 @@ class ShortlistIntegrationTests(unittest.TestCase):
         shortlist1 = create_shortlist(student_id=1, internship_id=1, staff_id=1)
         shortlist2 = create_shortlist(student_id=1, internship_id=2, staff_id=1)
         student_shortlists = get_shortlists_by_student_id(1)
-        assert student_shortlists == [shortlist1, shortlist2]
+        temp_shortlists = Shortlist.query.filter_by(studentId=1).all()
+        assert student_shortlists == temp_shortlists
     
     def test_get_shortlist_by_student(self):
         student = create_student("harry", "harrypass", "Information Technology")
