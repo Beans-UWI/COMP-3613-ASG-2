@@ -16,6 +16,14 @@ def create_response(shortlist_id, employer_id, status):
         db.session.commit()
         return response
 
+def update_response(response_id, status):
+    response = Response.query.get(response_id)
+    if response:
+        response.status = status
+        db.session.commit()
+        return True
+    return None
+
 def get_response_by_shortlist_id(shortlist_id):
     return db.session.execute(db.select(Response).filter_by(shortlistId=shortlist_id)).scalar_one_or_none()
 

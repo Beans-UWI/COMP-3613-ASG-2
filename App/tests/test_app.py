@@ -4,14 +4,28 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from App.main import create_app
 from App.database import db, create_db
-from App.models import User, Staff, InternshipPositions, Shortlist
+from App.models import User, Staff, InternshipPositions, Shortlist, Employer
 from App.controllers import (
     create_user,
     get_all_users_json,
     login,
     get_user,
     get_user_by_username,
-    update_user
+    get_student_by_username,
+    get_staff_by_username,
+    get_employer_by_username,
+    update_user,
+    get_internships_by_employer_id,
+    create_internship_position,
+    create_employer,
+    create_student,
+    create_staff,
+    create_response,
+    update_response,
+    get_shortlists_by_student_id,
+    get_response_by_shortlist_id,
+    create_shortlist,
+    get_shortlists_by_internship_id
 )
 
 
@@ -137,5 +151,66 @@ class UsersIntegrationTests(unittest.TestCase):
         update_user(1, "ronnie")
         user = get_user(1)
         assert user.username == "ronnie"
+    
+    def test_student_login_validation(self):
+        student = create_student("phil", "philpass", "Computer Science")
+        res = get_student_by_username("phil")
+        assert res == student
+    
+    def test_staff_login_validation(self):
+        staff = create_staff("randy", "randypass", "DCIT")
+        res = get_staff_by_username("randy")
+        assert res == staff
+    
+    def test_employer_login_validation(self):
+        employer = create_employer("walter", "walterpass", "ZS Associates", "Recruiter II")
+        res = get_employer_by_username("walter")
+        assert res == employer
+
+class InternshipIntegrationTests(unittest.TestCase):
+    
+    def test_get_internships_by_employer(self):
+        employer = create_employer("bill", "billpass", "Davyn", "Senior Engineer")
+        internship1 = create_internship_position(title="Software Developer", 
+                                         description = "Fullstack engineer with expertise in cloud", 
+                                         location = "San Fernando", 
+                                         duration=3, 
+                                         salary = 3000, 
+                                         employer_id= 1)
+        internship2 = create_internship_position(title="Software Engineer", 
+                                         description = "Fullstack engineer with expertise in python", 
+                                         location = "San Fernando", 
+                                         duration=12, 
+                                         salary = 4000, 
+                                         employer_id= 1)
+        employers_internships = get_internships_by_employer_id(1)
+        assert employers_internships == [internship1, internship2]
+
+class ShortlistIntegrationTests(unittest.TestCase):
+    
+    def test_get_shortlist_by_student(self):
+        student = create_student("john", "johnpass", "Computer Science")
+        staff = create_staff("pam", "pampass", "DCIT")
+        shortlist1 = create_shortlist(student_id=1, internship_id=1, staff_id=1)
+        shortlist2 = create_shortlist(student_id=1, internship_id=2, staff_id=1)
+        student_shortlists = get_shortlists_by_student_id(1)
+        assert student_shortlists == [shortlist1, shortlist2]
+    
+    def test_get_shortlist_by_student(self):
+        student = create_student("harry", "harrypass", "Information Technology")
+        shortlist1 = create_shortlist(student_id=2, internship_id=1, staff_id=1)
+        shortlists = get_shortlists_by_internship_id(1)
+        temp_shortlists = Shortlist.query.filter_by(internshipId=1).all()
+        assert shortlists == temp_shortlists
+
+class ResponseIntegrationTests(unittest.TestCase):
+    
+    def test_update_response(self):
+        new_response = create_response(1, 1, "Accepted")
+        response = get_response_by_shortlist_id(1)
+        update_response(response.responseId, "rejected")
+        updated_response = get_response_by_shortlist_id(1)
+        assert updated_response.status == "rejected"
+
         
 
