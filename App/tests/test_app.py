@@ -1,9 +1,10 @@
 import os, tempfile, pytest, logging, unittest
+from datetime import date
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from App.main import create_app
 from App.database import db, create_db
-from App.models import User
+from App.models import User, Staff, InternshipPositions, Shortlist
 from App.controllers import (
     create_user,
     get_all_users_json,
@@ -33,7 +34,7 @@ class UserUnitTests(unittest.TestCase):
     
     def test_hashed_password(self):
         password = "mypass"
-        hashed = generate_password_hash(password, method='sha256')
+        hashed = generate_password_hash(password)
         user = User("bob", password)
         assert user.password != password
 
@@ -41,6 +42,67 @@ class UserUnitTests(unittest.TestCase):
         password = "mypass"
         user = User("bob", password)
         assert user.check_password(password)
+    
+    def test_staff_get_json(self):
+        staff = Staff("jane_doe", "janepass", "DCIT")
+        staff_json = staff.get_json()
+        self.assertDictEqual(staff_json, {"staffId":None, "username":"jane_doe", "department":"DCIT"})
+
+class InternshipPositionsUnitTests(unittest.TestCase):
+    
+    def test_new_internship_position(self):
+        internship = InternshipPositions(title="Software Developer", 
+                                         description = "Fullstack developer with expertise in cloud", 
+                                         location = "San Fernando", 
+                                         durationInMonths=3, 
+                                         salary = 3000, 
+                                         employerId= 1)
+        assert internship.title == "Software Developer"
+        assert internship.location == "San Fernando"
+        assert internship.salary == 3000
+        assert internship.description == "Fullstack developer with expertise in cloud"
+        assert internship.durationInMonths == 3
+        assert internship.employerId == 1
+    
+    def test_internship_get_json(self):
+        internship = InternshipPositions(title="Software Developer", 
+                                         description = "Fullstack developer with expertise in cloud", 
+                                         location = "San Fernando", 
+                                         durationInMonths=3, 
+                                         salary = 3000, 
+                                         employerId= 1,
+                                         createdAt= date.today() )
+        internship_json = internship.get_json()
+        test_json = {"internshipId": None,
+                     "employerId": 1,
+                     "title": "Software Developer",
+                     "description": "Fullstack developer with expertise in cloud", 
+                     "location" : "San Fernando", 
+                     "durationInMonths": 3, 
+                     "salary": 3000,
+                     "createdAt": date.today().isoformat()}
+        self.assertDictEqual(internship_json, test_json)
+
+class ShortlistUnitTests(unittest.TestCase):
+    
+    def test_new_shortlist(self):
+        new_shortlist = Shortlist(studentId=1, internshipId=1, staffId=1, lastUpdated=date.today())
+        assert new_shortlist.studentId == 1
+        assert new_shortlist.staffId == 1
+        assert new_shortlist.internshipId == 1
+        assert new_shortlist.lastUpdated == date.today()
+    
+    def test_shortlist_get_json(self):
+        new_shortlist = Shortlist(studentId=1, internshipId=1, staffId=1, lastUpdated=date.today())
+        shortlist_json = new_shortlist.get_json()
+        test_json = { "shortlistId": None, "studentId": 1, "internshipId": 1, "staffId": 1, "lastUpdated": date.today().isoformat() }
+        self.assertDictEqual(shortlist_json, test_json)
+
+
+
+    
+
+
 
 '''
     Integration Tests
