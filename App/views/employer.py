@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, jsonify, request, send_from_directory, flash, redirect, url_for
 from flask_jwt_extended import jwt_required, current_user as jwt_current_user
-
+from App.utils.user_type_decorator import require_jwt_role
 from.index import index_views
 
 from App.controllers import (
@@ -14,6 +14,7 @@ from App.controllers import (
 employer_views = Blueprint('employer_views', __name__, template_folder='../templates')
 
 @employer_views.route('/api/<string:employer_id>/create-internship', methods=['POST'])
+@require_jwt_role('employer')
 def create_internship(employer_id):
     data = request.get_json()
     title = data.get('title')
@@ -28,21 +29,25 @@ def create_internship(employer_id):
 
 
 @employer_views.route('/api/<string:employer_id>/view-shortlist/<int:internship_id>', methods=['GET'])
+@require_jwt_role('employer')
 def view_shortlist(employer_id, internship_id):
     shortlist = view_shortlist_by_internship_id(internship_id)
     return jsonify(shortlist), 200
 
 @employer_views.route('/api/<string:employer_id>/view-all-shortlist', methods=['GET'])
+@require_jwt_role('employer')
 def view_all_shortlist(employer_id):
     shortlists = view_all_shortlists(employer_id, user_type="employer")
     return jsonify(shortlists), 200
 
 @employer_views.route('/api/<string:employer_id>/accept-student/<int:shortlist_id>', methods=['POST'])
+@require_jwt_role('employer')
 def accept_student_route(employer_id, shortlist_id):
     accept_student(shortlist_id)
     return jsonify({"message": "Student accepted."}), 200
 
 @employer_views.route('/api/<string:employer_id>/reject-student/<int:shortlist_id>', methods=['POST'])
+@require_jwt_role('employer')
 def reject_student_route(employer_id, shortlist_id):
     reject_student(shortlist_id)
     return jsonify({"message": "Student rejected."}), 200

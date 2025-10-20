@@ -57,6 +57,20 @@ def user_login_api():
   set_access_cookies(response, token)
   return response
 
+@auth_views.route('/api/auth', methods=['POST'])
+def api_auth_bearer():
+    data = request.json
+    if not data:
+        return jsonify(message='missing json body'), 400
+    username = data.get('username')
+    password = data.get('password')
+    if not username or not password:
+        return jsonify(message='username and password required'), 400
+    token = login(username, password)
+    if not token:
+        return jsonify(message='bad username or password given'), 401
+    return jsonify(access_token=token), 200
+
 @auth_views.route('/api/identify', methods=['GET'])
 @jwt_required()
 def identify_user():

@@ -1,5 +1,27 @@
 from functools import wraps
-from App.controllers.state import *
+from flask import jsonify
+from flask_jwt_extended import verify_jwt_in_request, get_jwt
+from App.controllers.state import get_session_state
+
+def require_jwt_role(*allowed_roles):
+    allowed = set(allowed_roles)
+    def decorator(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            try:
+                verify_jwt_in_request()
+            except Exception as e:
+                return jsonify(message="Missing or invalid token", error=str(e)), 401
+            claims = get_jwt()
+            role = claims.get('role')
+            if role not in allowed:
+                return jsonify(message="Forbidden: insufficient role", error=f"User role '{role}' is not allowed"), 403
+            return fn(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+# OLD CLI/session decorator kept for non-API parts of the app
 
 def require_user_type(required_type): # a factory for the decorator
     def decorator(f):
