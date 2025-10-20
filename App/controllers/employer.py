@@ -19,7 +19,7 @@ def can_employer_login(username, password):
     if not employer:
         print("Username not found")
         return False
-    if employer.password != password:
+    if not employer.check_password(password):
         print("Incorrect password")
         return False
     print("Employer login successful")

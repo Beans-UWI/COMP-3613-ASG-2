@@ -16,7 +16,7 @@ def can_staff_login(username, password):
     if not staff:
         print("Username not found")
         return False
-    if staff.password != password:
+    if not staff.check_password(password):
         print("Incorrect password")
         return False
     print("Staff login successful")
