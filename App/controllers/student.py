@@ -18,7 +18,7 @@ def can_student_login(username, password):
     if not student:
         print("Username not found")
         return False
-    if student.password != password:
+    if not student.check_password(password):
         print("Incorrect password")
         return False
     print("Student login successful")
