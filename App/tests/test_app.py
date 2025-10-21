@@ -30,7 +30,14 @@ from App.controllers import (
     get_internship_details,
     can_employer_login,
     can_student_login,
-    can_staff_login
+    can_staff_login,
+    view_shortlist_by_internship_id,
+    view_all_internships,
+    view_all_shortlists,
+    get_session_state,
+    login_session,
+    accept_student,
+    reject_student 
     )
 
 
@@ -143,6 +150,15 @@ class InternshipPositionsUnitTests(unittest.TestCase):
                      "createdAt": date.today().isoformat()}
         self.assertDictEqual(internship_json, test_json)
 
+    def test_internship_salary_nullable(self):
+        internship = InternshipPositions(title="Software Developer",                                                  
+                                         description="Frontend developer",
+                                         location="Freeport",
+                                         durationInMonths=1,
+                                         salary=None,
+                                         employerId=1)
+        assert internship.salary is None 
+
 class ShortlistUnitTests(unittest.TestCase):
     
     def test_new_shortlist(self):
@@ -158,6 +174,18 @@ class ShortlistUnitTests(unittest.TestCase):
         test_json = { "shortlistId": None, "studentId": 1, "internshipId": 1, "staffId": 1, "lastUpdated": date.today().isoformat() }
         self.assertDictEqual(shortlist_json, test_json)
 
+class ResponseUnitTests(unittest.TestCase):
+
+    def test_new_response(self):
+        response = Response(shortlistId=1, employerId=1, status="accepted")
+        assert response.shortlistId == 1
+        assert response.employerId == 1
+        assert response.status == "accepted"
+
+    def test_response_get_json(self):
+        response = Response(responseId=1, shortlistId=1, employerId=1, status="pending")                   
+        response_json = response.get_json()
+        assert response_json == {"responseId": 1, "shortlistId": 1, "employerId": 1, "status": "pending"}
 '''
     Integration Tests
 '''
@@ -321,6 +349,18 @@ class InternshipIntegrationTests(unittest.TestCase):
         assert internship1 in all_internships
         assert internship2 in all_internships
 
+    def test_view_all_internships(self):
+        employer2 = create_employer("darnell", "darnellpass", "Tech Solutions", "HR Manager")
+        internship = create_internship_position(title="Data Analyst", 
+                                                 description = "Data analyst with expertise in SQL", 
+                                                 location = "St. Augustine", 
+                                                 duration=6, 
+                                                 salary = 3500, 
+                                                 employer_id= 2)
+        all_internships = view_all_internships()
+        temp_internships = [i.get_json() for i in get_all_internships()]
+        assert all_internships == temp_internships    
+
 class ShortlistIntegrationTests(unittest.TestCase):
     
     def test_create_shortlist(self):
@@ -358,11 +398,95 @@ class ShortlistIntegrationTests(unittest.TestCase):
         student_shortlists = get_shortlists_by_student_id(1)
         assert student_shortlists == [shortlist1, shortlist2]
 
-    def test_get_shortlist_by_student(self):
+    def test_get_shortlist_by_internship(self):
         student = create_student("harry", "harrypass", "Information Technology")
         shortlist1 = create_shortlist(student_id=2, internship_id=1, staff_id=1)
         shortlists = get_shortlists_by_internship_id(1)
         temp_shortlists = Shortlist.query.filter_by(internshipId=1).all()
+        assert shortlists == temp_shortlists
+
+    def test_view_all_shortlists_as_student(self):
+        student = create_student("kate", "katepass", "Software Engineering")
+        login_session(student.username, "student", True)
+        state = get_session_state().user_type
+        assert state == "student"
+
+        employer = create_employer("james", "jamespass", "Innotech", "HR Manager")
+
+        internship1 = create_internship_position(title="Web Developer", 
+                                                 description = "Web developer with expertise in HTML/CSS", 
+                                                 location = "Couva",
+                                                 duration=3,
+                                                 salary = 3000,
+                                                 employer_id= employer.employerId
+                                                )
+        
+        internship2 = create_internship_position(title="Mobile App Developer", 
+                                                 description = "Mobile app developer with expertise in Android", 
+                                                 location = "Arima",
+                                                 duration=6,
+                                                 salary = 4000,
+                                                 employer_id= employer.employerId
+                                                )
+        
+        shortlist1 = create_shortlist(student_id=student.studentId, internship_id=internship1.internshipId, staff_id=1)
+        shortlist2 = create_shortlist(student_id=student.studentId, internship_id=internship2.internshipId, staff_id=1)
+
+        temp_shortlists = get_shortlists_by_student_id(student.studentId)
+        shortlists = view_all_shortlists(id=student.studentId, user_type="student")
+        expected_shortlists = [s.get_json() for s in temp_shortlists]
+        assert shortlists == expected_shortlists
+
+    def test_view_all_shortlists_as_employer(self):
+        employer = create_employer("linda", "lindapass", "TechCorp", "HR Lead")
+        login_session(employer.username, "employer", True)
+        state = get_session_state().user_type
+        assert state == "employer"
+
+        student1 = create_student("lukey", "lukepass", "Information Systems")
+        student2 = create_student("mikey", "mikepass", "Computer Science")
+
+        internship1 = create_internship_position(title="Network Engineer", 
+                                                 description = "Network engineer with expertise in Cisco", 
+                                                 location = "Chaguanas",
+                                                 duration=6,
+                                                 salary = 4500,
+                                                 employer_id= employer.employerId
+                                                )
+        internship2 = create_internship_position(title="Cybersecurity Analyst", 
+                                                 description = "Cybersecurity analyst with expertise in threat detection", 
+                                                 location = "Port of Spain",
+                                                 duration=12,
+                                                 salary = 6000,
+                                                 employer_id= employer.employerId
+                                                )
+        
+        shortlist1 = create_shortlist(student_id=student1.studentId, internship_id=internship1.internshipId, staff_id=1)
+        shortlist2 = create_shortlist(student_id=student2.studentId, internship_id=internship2.internshipId, staff_id=1)
+
+        temp_shortlists = get_shortlists_by_internship_id(internship1.internshipId) + get_shortlists_by_internship_id(internship2.internshipId)
+        assert shortlist1 in temp_shortlists
+        assert shortlist2 in temp_shortlists
+
+        expected_shortlists = [s.get_json() for s in temp_shortlists]
+        shortlists = view_all_shortlists(id=employer.employerId, user_type="employer") 
+
+        assert shortlists == expected_shortlists
+
+    def test_view_shortlist_by_internshipid(self):
+        employer = create_employer("nancy", "nancypass", "InfoTech", "Recruiter")
+        internship = create_internship_position(title="AI Specialist", 
+                                                 description = "AI specialist with expertise in machine learning", 
+                                                 location = "San Fernando", 
+                                                 duration=6, 
+                                                 salary = 5000, 
+                                                 employer_id= 4)
+        student1 = create_student("oliver", "oliverpass", "Computer Science")
+        student2 = create_student("paul", "paulpass", "Information Technology")
+        shortlist1 = create_shortlist(student_id=7, internship_id=5, staff_id=5)
+        shortlist2 = create_shortlist(student_id=8, internship_id=5, staff_id=5)
+        shortlists = view_shortlist_by_internship_id(5)
+        temp_shortlists = [s.get_json() for s in get_shortlists_by_internship_id(5)]
         assert shortlists == temp_shortlists
 
 class ResponseIntegrationTests(unittest.TestCase):
@@ -373,8 +497,58 @@ class ResponseIntegrationTests(unittest.TestCase):
         assert new_response == temp_response
 
     def test_update_response(self):
-        new_response = create_response(1, 1, "Accepted")
-        response = get_response_by_shortlist_id(1)
+        response = create_response(shortlist_id=1, employer_id=1, status="Pending")
+        assert response.status == "Pending"
+
         update_response(response.responseId, "rejected")
+
         updated_response = get_response_by_shortlist_id(1)
+        assert updated_response.status == "rejected" 
+
+    def test_accept_student(self):
+        employer = create_employer("lindsey", "lindseypass", "TechCorp", "HR Lead")
+        login_session(employer.username, "employer", True) 
+        
+        response = create_response(shortlist_id=1, employer_id=employer.employerId, status="pending")
+        assert response.status == "pending"
+
+        accept_student(response.shortlistId)
+
+        updated_response = get_response_by_shortlist_id(response.shortlistId)
+        assert updated_response.status == "accepted"
+
+    def test_reject_student(self):
+        employer = create_employer("soyer", "soyerpass", "TechCorp", "HR Lead")
+        login_session(employer.username, "employer", True) 
+        
+        response = create_response(shortlist_id=1, employer_id=employer.employerId, status="pending")
+        assert response.status == "pending"
+
+        reject_student(response.shortlistId)
+
+        updated_response = get_response_by_shortlist_id(response.shortlistId)
         assert updated_response.status == "rejected"
+
+    def test_view_response(self):
+        student = create_student("sophia", "sophiapass", "Computer Engineering")
+        employer = create_employer("innovatech", "innovapass", "InnovaTech", "HR Manager")
+        staff = create_staff("george", "georgepass", "DCIT")
+        internship = create_internship_position(title="Software Tester Intern",
+                                                description="Test software applications",
+                                                location="Seattle",
+                                                duration=5,
+                                                salary=3200,
+                                                employer_id=employer.employerId
+                                            )
+        shortlist = create_shortlist(student_id=student.studentId,
+                                     internship_id=internship.internshipId,
+                                     staff_id=staff.staffId)
+        
+        response = create_response(shortlist_id=shortlist.shortlistId,
+                                           employer_id=employer.employerId,
+                                           status="Pending")
+        
+        new_response = get_response_by_shortlist_id(shortlist.shortlistId)
+        assert response == new_response
+
+
