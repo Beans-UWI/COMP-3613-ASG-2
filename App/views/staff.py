@@ -10,13 +10,13 @@ from App.controllers import (
 
 staff_views = Blueprint('staff_views', __name__, template_folder='../templates')
 
-@staff_views.route('/<string:staff_id>/list-internships', methods=['GET'])
+@staff_views.route('/api/<string:staff_id>/list-internships', methods=['GET'])
 @require_jwt_role('staff')
 def list_internships(staff_id):
     internships = view_all_internships()
     return jsonify(internships), 200
 
-@staff_views.route('/<string:staff_id>/add-student', methods=['POST'])
+@staff_views.route('/api/<string:staff_id>/add-student', methods=['POST'])
 @require_jwt_role('staff')
 def add_student(staff_id):
     data = request.get_json()
