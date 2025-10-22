@@ -20,7 +20,10 @@ def get_shortlists_by_student_id(student_id):
     return db.session.execute(db.select(Shortlist).filter_by(studentId=student_id)).scalars().all()
 
 def get_shortlists_by_internship_id(internship_id):
-    return db.session.execute(db.select(Shortlist).filter_by(internshipId=internship_id)).scalars().all()
+    if isinstance(internship_id, int):
+        return Shortlist.query.filter_by(internshipId=internship_id).all()
+    elif isinstance(internship_id, list):
+        return Shortlist.query.filter(Shortlist.internshipId.in_(internship_id)).all()
 
 
 # this was way more annoying than i thought it would be
