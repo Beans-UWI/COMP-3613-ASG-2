@@ -43,11 +43,11 @@ def view_all_shortlist(employer_id):
 @employer_views.route('/api/<string:employer_id>/accept-student/<int:shortlist_id>', methods=['POST'])
 @require_jwt_role('employer')
 def accept_student_route(employer_id, shortlist_id):
-    accept_student(shortlist_id)
+    accept_student(shortlist_id, employer_id) 
     return jsonify({"message": "Student accepted."}), 200
 
 @employer_views.route('/api/<string:employer_id>/reject-student/<int:shortlist_id>', methods=['POST'])
 @require_jwt_role('employer')
 def reject_student_route(employer_id, shortlist_id):
-    reject_student(shortlist_id)
+    reject_student(shortlist_id, employer_id)
     return jsonify({"message": "Student rejected."}), 200

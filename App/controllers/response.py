@@ -31,8 +31,14 @@ def view_response(shortlist_id):
     response = get_response_by_shortlist_id(shortlist_id)
     return response.get_json() if response else print("No response found")
 
-def accept_student(shortlist_id): 
-    create_response(shortlist_id, get_current_employer_id(), "accepted")
+def accept_student(shortlist_id, employer_id=None):
+    if employer_id is None:
+        employer_id = get_current_employer_id()
+    
+    create_response(shortlist_id, employer_id, "accepted")
 
-def reject_student(shortlist_id):
-    create_response(shortlist_id, get_current_employer_id(), "rejected")
+def reject_student(shortlist_id, employer_id=None):
+    if employer_id is None:
+        employer_id = get_current_employer_id()
+
+    create_response(shortlist_id, employer_id, "rejected")

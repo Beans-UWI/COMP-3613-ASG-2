@@ -74,7 +74,17 @@ def api_auth_bearer():
 @auth_views.route('/api/identify', methods=['GET'])
 @jwt_required()
 def identify_user():
-    return jsonify({'message': f"username: {current_user.username}, id : {current_user.id}"})
+    # Identify the type of user logged in
+    user_type = type(current_user).__name__
+
+    # Dynamically get ID based on user type
+    user_id = getattr(current_user, 'employerId', None) \
+            or getattr(current_user, 'staffId', None) \
+            or getattr(current_user, 'studentId', None)
+
+    return jsonify({
+        "username": current_user.username
+    }), 200
 
 @auth_views.route('/api/logout', methods=['GET'])
 def logout_api():
