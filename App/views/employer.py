@@ -23,9 +23,12 @@ def create_internship(employer_id):
     duration_in_months = data.get('durationInMonths')
     salary = data.get('salary')
 
-    create_internship_position(title, description, location, duration_in_months, salary, employer_id)
+    internship = create_internship_position(title, description, location, duration_in_months, salary, employer_id)
 
-    return jsonify({"message": "Internship created successfully."}), 201
+    return jsonify({
+        "message": "Internship created successfully.",
+        "internship_id": internship.internshipId
+    }), 201
 
 
 @employer_views.route('/api/<string:employer_id>/view-shortlist/<int:internship_id>', methods=['GET'])
@@ -34,20 +37,20 @@ def view_shortlist(employer_id, internship_id):
     shortlist = view_shortlist_by_internship_id(internship_id)
     return jsonify(shortlist), 200
 
-@employer_views.route('/api/<string:employer_id>/view-all-shortlist', methods=['GET'])
+@employer_views.route('/api/<string:employer_id>/applicant-shortlists', methods=['GET'])
 @require_jwt_role('employer')
-def view_all_shortlist(employer_id):
+def employer_view_all_shortlist(employer_id):
     shortlists = view_all_shortlists(employer_id, user_type="employer")
     return jsonify(shortlists), 200
 
 @employer_views.route('/api/<string:employer_id>/accept-student/<int:shortlist_id>', methods=['POST'])
 @require_jwt_role('employer')
 def accept_student_route(employer_id, shortlist_id):
-    accept_student(shortlist_id)
+    accept_student(shortlist_id, employer_id)
     return jsonify({"message": "Student accepted."}), 200
 
 @employer_views.route('/api/<string:employer_id>/reject-student/<int:shortlist_id>', methods=['POST'])
 @require_jwt_role('employer')
 def reject_student_route(employer_id, shortlist_id):
-    reject_student(shortlist_id)
+    reject_student(shortlist_id, employer_id)
     return jsonify({"message": "Student rejected."}), 200

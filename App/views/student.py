@@ -12,7 +12,7 @@ from App.controllers import *
 
 student_views = Blueprint('student_views', __name__, template_folder='../templates')
 
-@student_views.route('/api/<string:student_id>/view-all-shortlist', methods=['GET'])
+@student_views.route('/api/<string:student_id>/my-shortlists', methods=['GET'])
 @require_jwt_role('student')
 def view_all_shortlist(student_id):
     shortlists = view_all_shortlists(student_id, user_type="student")
