@@ -1,0 +1,1064 @@
+{
+	"info": {
+		"_postman_id": "f875fcb0-e929-4cc3-894c-b378e8a8c564",
+		"name": "Internship Platform API",
+		"description": "# 🚀 Get started here\n\nThis template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this template**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these [request](https://learning.postman.com/docs/sending-requests/requests/) types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT request.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a [variable](https://learning.postman.com/docs/sending-requests/variables/) called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Scripts\" tab**\n\nAdding tests to your requests can help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/fa30ea0a-373d-4545-a668-e7b283cca343/aW1hZ2UucG5n\" width=\"2162\" height=\"1530\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more [scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/) to verify if the API works as expected and execute workflows.\n    \n\n## 💡Related templates\n\n[API testing basics](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9a37a28-055b-49cd-8c7e-97494a21eb54&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[API documentation](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=e9c28f47-1253-44af-a2f3-20dce4da1f18&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)  \n[Authorization methods](https://go.postman.co/redirect/workspace?type=personal&collectionTemplateId=31a9a6ed-4cdf-4ced-984c-d12c9aec1c27&sourceTemplateId=ddb19591-3097-41cf-82af-c84273e56719)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "32448840"
+	},
+	"item": [
+		{
+			"name": "(Student) Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login returns access token\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData['access_token']).to.exist;\r",
+							"    \r",
+							"    pm.environment.set('access_token', jsonData['access_token']);\r",
+							"    \r",
+							"    let token = jsonData['access_token'];\r",
+							"    let payload = JSON.parse(atob(token.split('.')[1]));\r",
+							"    let user_id = payload.sub;\r",
+							"    let role = payload.role;\r",
+							"    let username = payload.username;\r",
+							"    \r",
+							"    if (role === 'student') {\r",
+							"        pm.environment.set('student_id', user_id);\r",
+							"    } else if (role === 'employer') {\r",
+							"        pm.environment.set('employer_id', user_id);\r",
+							"    } else if (role === 'staff') {\r",
+							"        pm.environment.set('staff_id', user_id);\r",
+							"    }\r",
+							"    \r",
+							"    console.log(`Logged in as ${username} (${role}) with ID: ${user_id}`);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Login response format is correct\", function () {\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('access_token');\r",
+							"    pm.expect(jsonData['access_token']).to.be.a('string');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"student1\",\r\n    \"password\": \"password1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/auth",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(Employer) Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login returns access token\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData['access_token']).to.exist;\r",
+							"    \r",
+							"    pm.environment.set('access_token', jsonData['access_token']);\r",
+							"    \r",
+							"    let token = jsonData['access_token'];\r",
+							"    let payload = JSON.parse(atob(token.split('.')[1]));\r",
+							"    let user_id = payload.sub;\r",
+							"    let role = payload.role;\r",
+							"    let username = payload.username;\r",
+							"    \r",
+							"    if (role === 'student') {\r",
+							"        pm.environment.set('student_id', user_id);\r",
+							"    } else if (role === 'employer') {\r",
+							"        pm.environment.set('employer_id', user_id);\r",
+							"    } else if (role === 'staff') {\r",
+							"        pm.environment.set('staff_id', user_id);\r",
+							"    }\r",
+							"    \r",
+							"    console.log(`Logged in as ${username} (${role}) with ID: ${user_id}`);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Login response format is correct\", function () {\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('access_token');\r",
+							"    pm.expect(jsonData['access_token']).to.be.a('string');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"employer1\",\r\n    \"password\": \"password1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/auth",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(Employer) Create Internship",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Internship created successfully\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData['message']).to.eql('Internship created successfully.');\r",
+							"    pm.expect(jsonData['internship_id']).to.exist;\r",
+							"    pm.environment.set('internship_id', jsonData['internship_id']);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"title\": \"Internship Title3\",\r\n    \"description\": \"Job description\",\r\n    \"location\": \"Location\",\r\n    \"durationInMonths\": 6,\r\n    \"salary\": 50000\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/{{employer_id}}/create-internship",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{employer_id}}",
+						"create-internship"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(Staff) Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login returns access token\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData['access_token']).to.exist;\r",
+							"    \r",
+							"    pm.environment.set('access_token', jsonData['access_token']);\r",
+							"    \r",
+							"    let token = jsonData['access_token'];\r",
+							"    let payload = JSON.parse(atob(token.split('.')[1]));\r",
+							"    let user_id = payload.sub;\r",
+							"    let role = payload.role;\r",
+							"    let username = payload.username;\r",
+							"    \r",
+							"    if (role === 'student') {\r",
+							"        pm.environment.set('student_id', user_id);\r",
+							"    } else if (role === 'employer') {\r",
+							"        pm.environment.set('employer_id', user_id);\r",
+							"    } else if (role === 'staff') {\r",
+							"        pm.environment.set('staff_id', user_id);\r",
+							"    }\r",
+							"    \r",
+							"    console.log(`Logged in as ${username} (${role}) with ID: ${user_id}`);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Login response format is correct\", function () {\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('access_token');\r",
+							"    pm.expect(jsonData['access_token']).to.be.a('string');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"staff1\",\r\n    \"password\": \"password1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/auth",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(Staff) Get Internships",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Internships list retrieved successfully\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an('array');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/{{staff_id}}/list-internships",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{staff_id}}",
+						"list-internships"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(Staff) Create Shortlist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Student added to shortlist successfully\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData['message']).to.eql('Student added to shortlist.');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"student_id\": 2,\r\n  \"internship_id\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/{{staff_id}}/add-student",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{staff_id}}",
+						"add-student"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(Employer) Login Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login returns access token\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData['access_token']).to.exist;\r",
+							"    \r",
+							"    pm.environment.set('access_token', jsonData['access_token']);\r",
+							"    \r",
+							"    let token = jsonData['access_token'];\r",
+							"    let payload = JSON.parse(atob(token.split('.')[1]));\r",
+							"    let user_id = payload.sub;\r",
+							"    let role = payload.role;\r",
+							"    let username = payload.username;\r",
+							"    \r",
+							"    if (role === 'student') {\r",
+							"        pm.environment.set('student_id', user_id);\r",
+							"    } else if (role === 'employer') {\r",
+							"        pm.environment.set('employer_id', user_id);\r",
+							"    } else if (role === 'staff') {\r",
+							"        pm.environment.set('staff_id', user_id);\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Login response format is correct\", function () {\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('access_token');\r",
+							"    pm.expect(jsonData['access_token']).to.be.a('string');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"employer1\",\r\n    \"password\": \"password1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/auth",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(Employer) View Shortlist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Shortlist retrieved successfully\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an('array');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/{{employer_id}}/view-shortlist/{{internship_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{employer_id}}",
+						"view-shortlist",
+						"{{internship_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(Employer) View All Shortlists",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Employer applicant shortlists retrieved successfully\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an('array');\r",
+							"    if (jsonData.length > 0) {\r",
+							"        pm.environment.set('shortlist_id', jsonData[0].shortlistId);\r",
+							"        console.log(`Found ${jsonData.length} applicant shortlists`);\r",
+							"        console.log(\"First shortlist ID:\", jsonData[0].shortlistId);\r",
+							"        console.log(\"First shortlist:\", jsonData[0]);\r",
+							"    } else {\r",
+							"        console.log(\"No applicant shortlists found\");\r",
+							"    }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/{{employer_id}}/applicant-shortlists",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{employer_id}}",
+						"applicant-shortlists"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(Employer) Accept Student",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Student acceptance successful\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData['message']).to.eql('Student accepted.');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/{{employer_id}}/accept-student/{{shortlist_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{employer_id}}",
+						"accept-student",
+						"{{shortlist_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(Employer) Reject Student",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Student rejection successful\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData['message']).to.eql('Student rejected.');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/{{employer_id}}/reject-student/{{shortlist_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{employer_id}}",
+						"reject-student",
+						"{{shortlist_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(Student) Login Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login returns access token\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData['access_token']).to.exist;\r",
+							"    \r",
+							"    pm.environment.set('access_token', jsonData['access_token']);\r",
+							"    \r",
+							"    let token = jsonData['access_token'];\r",
+							"    let payload = JSON.parse(atob(token.split('.')[1]));\r",
+							"    let user_id = payload.sub;\r",
+							"    let role = payload.role;\r",
+							"    let username = payload.username;\r",
+							"    \r",
+							"    if (role === 'student') {\r",
+							"        pm.environment.set('student_id', user_id);\r",
+							"    } else if (role === 'employer') {\r",
+							"        pm.environment.set('employer_id', user_id);\r",
+							"    } else if (role === 'staff') {\r",
+							"        pm.environment.set('staff_id', user_id);\r",
+							"    }\r",
+							"    \r",
+							"    console.log(`Logged in as ${username} (${role}) with ID: ${user_id}`);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Login response format is correct\", function () {\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.have.property('access_token');\r",
+							"    pm.expect(jsonData['access_token']).to.be.a('string');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"student1\",\r\n    \"password\": \"password1\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/auth",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(Student) View All Shortlists",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Student shortlists retrieved successfully\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an('array');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/{{student_id}}/my-shortlists",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{student_id}}",
+						"my-shortlists"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "(Student) Get Response",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Employer response retrieved successfully\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData).to.be.an('object');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/api/{{student_id}}}/view-employer-response/{{staff_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{student_id}}}",
+						"view-employer-response",
+						"{{staff_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Identify User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User identification successful\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData['message']).to.include('username:');\r",
+							"    pm.expect(jsonData['message']).to.include('id:');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/identify",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"identify"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Get all users returns array\", function () {",
+							"    pm.response.to.have.status(200);",
+							"    pm.response.to.be.json;",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/users",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"users"
+					]
+				},
+				"description": "This is a GET request and it is used to \"get\" data from an endpoint. There is no request body for a GET request, but you can use query parameters to help specify the resource you want data on (e.g., in this request, we have `id=1`).\n\nA successful GET response will have a `200 OK` status, and should include some kind of response body - for example, HTML web content or JSON data."
+			},
+			"response": []
+		},
+		{
+			"name": "Create User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"User created successfully\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    \r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData['message']).to.include('user');\r",
+							"    pm.expect(jsonData['message']).to.include('created with id');\r",
+							"    \r",
+							"    let currentCounter = parseInt(pm.collectionVariables.get('user_counter')) || 1;\r",
+							"    pm.collectionVariables.set('user_counter', currentCounter + 1);\r",
+							"    \r",
+							"    console.log(`User created: user${currentCounter}`);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"user{{user_counter}}\",\r\n  \"password\": \"password{{user_counter}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/api/users",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Logout successful\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    pm.response.to.be.json;\r",
+							"    let jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData['message']).to.eql('Logged Out!');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Token cleared after logout\", function () {\r",
+							"    pm.environment.unset('access_token');\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"student1\",\r\n    \"password\": \"password1\"\r\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/logout",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "id",
+			"value": "1"
+		},
+		{
+			"key": "base_url",
+			"value": "https://template-api.postman.co"
+		},
+		{
+			"key": "user_counter",
+			"value": ""
+		}
+	]
+}
